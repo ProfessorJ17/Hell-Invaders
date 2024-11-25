@@ -1,99 +1,115 @@
-// HTML Canvas
-let canvas;
-let canvasContext;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML Canvas Game</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    canvas {
+      border: 2px solid #fff;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <script>
+    // JavaScript code starts here
+    let canvas;
+    let canvasContext;
 
-// Game Config
-const FRAMES_PER_SECOND = 30;
-const FLEET_SIDE_MARGIN = 80;
-const FLEET_TOP_MARGIN = 100;
-const PLAYER_SIDE_MARGIN = 10;
-const PLAYER_BOT_MARGIN = 50;
-const INSTRUCTIONS = 'LEFT / RIGHT ARROWS TO MOVE  |  SPACE TO FIRE';
-const GAME_OVER = 'Game Over!';
-const GAME_OVER_COLOR = 'white';
-const SCORE_INCREMENT = 100;
-const SCORE_COLOR = '#99ff99';
-const PLAYER_LIVES = 3;
-const MAX_LEVEL = 6;
+    // Game Config
+    const FRAMES_PER_SECOND = 30;
+    const FLEET_SIDE_MARGIN = 80;
+    const FLEET_TOP_MARGIN = 100;
+    const PLAYER_SIDE_MARGIN = 10;
+    const PLAYER_BOT_MARGIN = 50;
+    const INSTRUCTIONS = 'LEFT / RIGHT ARROWS TO MOVE  |  SPACE TO FIRE';
+    const GAME_OVER = 'Game Over!';
+    const GAME_OVER_COLOR = 'white';
+    const SCORE_INCREMENT = 100;
+    const SCORE_COLOR = '#99ff99';
+    const PLAYER_LIVES = 3;
+    const MAX_LEVEL = 6;
 
-// Enemy/Fleet Config
-let enemyVelocityX = 15;
-let enemyVelocityY = 0; // adjusts fleet moving down
-const ENEMY_HEIGHT = 30; // Increased enemy height
-const ENEMY_WIDTH = 60; // Increased enemy width
-const ENEMY_COLOR = '#ffcccc';
-const FLEET_ROWS = 6;
-const FLEET_COLUMNS = 6;
-const FLEET_WIDTH_RATIO = 0.6; // ratio to canvas
-const FLEET_HEIGHT_RATIO = 0.5; // ratio to canvas
-const FLEET_MOVE_RATE = 1000; // how often fleet moves (in milliseconds)
-const ENEMY_FIRE_RATE = 1000; // fire rate for enemy bullets in milliseconds
-const ENEMY_BULLET_VELOCITY_Y = 5;
+    // Enemy/Fleet Config
+    let enemyVelocityX = 15;
+    let enemyVelocityY = 0; 
+    const ENEMY_HEIGHT = 30; 
+    const ENEMY_WIDTH = 60; 
+    const ENEMY_COLOR = '#ffcccc';
+    const FLEET_ROWS = 6;
+    const FLEET_COLUMNS = 6;
+    const FLEET_WIDTH_RATIO = 0.6; 
+    const FLEET_HEIGHT_RATIO = 0.5; 
+    const FLEET_MOVE_RATE = 1000; 
+    const ENEMY_FIRE_RATE = 1000; 
+    const ENEMY_BULLET_VELOCITY_Y = 5;
 
-// Player Config
-const PLAYER_HEIGHT = 40; // Increased player height
-const PLAYER_WIDTH = 30;
-const PLAYER_COLOR = '#99ccff';
-const PLAYER_VELOCITY_X = 15; // Increased player velocity for faster movement
+    // Player Config
+    const PLAYER_HEIGHT = 40;
+    const PLAYER_WIDTH = 30;
+    const PLAYER_COLOR = '#99ccff';
+    const PLAYER_VELOCITY_X = 15;
 
-// Bullet Config
-const BULLET_VELOCITY_Y = 20;
-const BULLET_HEIGHT = 15; // Increased bullet height for easier collision detection
-const BULLET_WIDTH = 6; // Increased bullet width for easier collision detection
-const BULLET_HITBOX_SIZE = 20; // Adjusted bullet hitbox size
-const BULLET_RATE = 1500; // fire rate in milliseconds (twice as fast as invaders)
-const BULLET_EMOJI = '✝'; // Changed bullet emoji to lightning bolt
+    // Bullet Config
+    const BULLET_VELOCITY_Y = 20;
+    const BULLET_HEIGHT = 15; 
+    const BULLET_WIDTH = 6; 
+    const BULLET_HITBOX_SIZE = 20; 
+    const BULLET_RATE = 1500; 
+    const BULLET_EMOJI = '✝'; 
 
-// Positions & Timer
-let score = 0;
-let lives = PLAYER_LIVES;
-let gameStart = false;
-let gameOver = false;
-let enemyFleet = {};
-let fleetCenterX;
-let fleetCenterY;
-let fleetMovementTimer = 0;
-let playerCenterX;
-let playerCenterY;
-let bullets = [];
-let enemyBullets = [];
-let bulletTimer = BULLET_RATE;
-let bulletCooldown = false;
-let enemyBulletTimer = ENEMY_FIRE_RATE;
-let level = 1; // Current level
-const enemyEmojis = ['👾', '👽', '💀', '👻', '👺', '👹']; // Emojis for each level
-const level1InvadersImage = new Image();
-level1InvadersImage.src = 'C:/Hell Invaders/bael.png'; // Image for level 1 invaders
-level1InvadersImage.onload = () => { // When image loads successfully
-  // Start the game if the image loads successfully
-  gameStart = true;
-};
-level1InvadersImage.onerror = () => { // When image fails to load
-  // Start the game with emojis if the image fails to load
-  gameStart = true;
-};
+    // Positions & Timer
+    let score = 0;
+    let lives = PLAYER_LIVES;
+    let gameStart = false;
+    let gameOver = false;
+    let enemyFleet = {};
+    let fleetCenterX;
+    let fleetCenterY;
+    let fleetMovementTimer = 0;
+    let playerCenterX;
+    let playerCenterY;
+    let bullets = [];
+    let enemyBullets = [];
+    let bulletTimer = BULLET_RATE;
+    let bulletCooldown = false;
+    let enemyBulletTimer = ENEMY_FIRE_RATE;
+    let level = 1; 
+    const enemyEmojis = ['👾', '👽', '💀', '👻', '👺', '👹']; 
 
-// On Load
-window.onload = function() {
-  canvas = document.getElementById('gameCanvas');
-  canvasContext = canvas.getContext('2d');
+    // On Load
+    window.onload = function() {
+      canvas = document.getElementById('gameCanvas');
+      canvasContext = canvas.getContext('2d');
 
-  positionFleet();
-  positionPlayer();
+      positionFleet();
+      positionPlayer();
 
-  setInterval(runAll, 1000 / FRAMES_PER_SECOND);
+      setInterval(runAll, 1000 / FRAMES_PER_SECOND);
 
-  document.addEventListener('keydown', movePlayer);
-  document.addEventListener('keydown', fireBullet);
-};
+      document.addEventListener('keydown', movePlayer);
+      document.addEventListener('keydown', fireBullet);
+    };
 
-// Umbrella Run All
-function runAll() {
-  fleetMovementTimer += 1000 / FRAMES_PER_SECOND;
-  enemyBulletTimer += Math.random() * 1000 / FRAMES_PER_SECOND; // Add randomness to the time between ticks
-  reloadBullet();
-  moveEverything();
-  drawEverything();
+    // Functions (same as the original code provided, structured properly)
+    // Umbrella Run All
+    function runAll() {
+      fleetMovementTimer += 1000 / FRAMES_PER_SECOND;
+      enemyBulletTimer += Math.random() * 1000 / FRAMES_PER_SECOND;
+      reloadBullet();
+      moveEverything();
+      drawEverything();
 }
 
 // Initial Enemy Fleet Position
